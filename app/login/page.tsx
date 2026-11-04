@@ -1,20 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setMessage("");
     setLoading(true);
-    setIsSuccess(false);
 
     try {
       const response = await fetch("/api/login", {
@@ -32,8 +33,7 @@ export default function LoginPage() {
         return;
       }
 
-      setIsSuccess(true);
-      setMessage(data.message);
+      router.push("/message");
     } catch {
       setMessage("Unable to connect. Please try again.");
     } finally {
@@ -57,6 +57,7 @@ export default function LoginPage() {
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Email
             </label>
+
             <input
               type="email"
               value={email}
@@ -71,6 +72,7 @@ export default function LoginPage() {
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Password
             </label>
+
             <input
               type="password"
               value={password}
@@ -90,11 +92,7 @@ export default function LoginPage() {
           </button>
 
           {message && (
-            <p
-              className={`text-sm ${
-                isSuccess ? "text-green-600" : "text-red-600"
-              }`}
-            >
+            <p className="text-sm text-red-600">
               {message}
             </p>
           )}

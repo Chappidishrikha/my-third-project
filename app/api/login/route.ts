@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createSession } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
@@ -10,7 +11,6 @@ export async function POST(request: Request) {
       typeof body.email === "string"
         ? body.email.trim().toLowerCase()
         : "";
-
     const password =
       typeof body.password === "string" ? body.password : "";
 
@@ -44,7 +44,9 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({
+    const token = await createSession(user.id);
+
+    const response = NextResponse.json({
       message: "Login successful!",
       user: {
         id: user.id,
@@ -52,6 +54,16 @@ export async function POST(request: Request) {
         email: user.email,
       },
     });
+
+    response.cookies.set("session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
   } catch (error) {
     console.error("Login error:", error);
 
