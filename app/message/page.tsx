@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export const instant = false;
 
@@ -11,6 +12,15 @@ export default async function MessagePage() {
   const session = token ? await verifySession(token) : null;
 
   if (!session || typeof session.userId !== "number") {
+    redirect("/login");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { name: true },
+  });
+
+  if (!user) {
     redirect("/login");
   }
 
@@ -27,7 +37,7 @@ export default async function MessagePage() {
       }}
     >
       <h1 style={{ fontSize: "32px", color: "#2563eb", marginBottom: "16px" }}>
-        Welcome!
+        Welcome, {user.name}!
       </h1>
 
       <p style={{ fontSize: "18px", color: "#333" }}>
