@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -10,6 +11,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setEmail("");
+    setPassword("");
+  }, []);
 
   async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,6 +39,8 @@ export default function LoginPage() {
         return;
       }
 
+      setEmail("");
+      setPassword("");
       router.push("/message");
     } catch {
       setMessage("Unable to connect. Please try again.");
@@ -52,7 +60,7 @@ export default function LoginPage() {
           Log in to your account.
         </p>
 
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleLogin} autoComplete="off" className="space-y-5">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Email
@@ -60,6 +68,8 @@ export default function LoginPage() {
 
             <input
               type="email"
+              name="user-email"
+              autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
@@ -75,6 +85,8 @@ export default function LoginPage() {
 
             <input
               type="password"
+              name="user-password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
@@ -92,9 +104,7 @@ export default function LoginPage() {
           </button>
 
           {message && (
-            <p className="text-sm text-red-600">
-              {message}
-            </p>
+            <p className="text-sm text-red-600">{message}</p>
           )}
         </form>
       </div>

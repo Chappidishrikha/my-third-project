@@ -1,3 +1,4 @@
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/auth";
@@ -11,6 +12,7 @@ export async function POST(request: Request) {
       typeof body.email === "string"
         ? body.email.trim().toLowerCase()
         : "";
+
     const password =
       typeof body.password === "string" ? body.password : "";
 
@@ -25,7 +27,8 @@ export async function POST(request: Request) {
       where: { email },
     });
 
-    if (!user) {
+    // Regular login is only for USER accounts.
+    if (!user || user.role !== "USER") {
       return NextResponse.json(
         { message: "Invalid email or password." },
         { status: 401 }
@@ -41,6 +44,14 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { message: "Invalid email or password." },
         { status: 401 }
+      );
+    }
+
+    // Prevent inactive users from logging in.
+    if (!user.isActive) {
+      return NextResponse.json(
+        { message: "Your account has been deactivated. Please contact the administrator." },
+        { status: 403 }
       );
     }
 

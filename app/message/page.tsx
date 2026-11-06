@@ -1,7 +1,10 @@
+
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { verifySession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import LogoutButton from "@/app/components/LogoutButton";
 
 export const instant = false;
 
@@ -47,6 +50,24 @@ export default async function MessagePage() {
       <h2 style={{ marginTop: "25px", color: "#1e293b" }}>
         Have a great day!
       </h2>
+
+      <Link
+        href="/profile"
+        style={{
+          marginTop: "30px",
+          backgroundColor: "#2563eb",
+          color: "white",
+          padding: "12px 24px",
+          borderRadius: "8px",
+          textDecoration: "none",
+        }}
+      >
+        View My Profile
+      </Link>
+
+      <div style={{ marginTop: "20px" }}>
+        <LogoutButton />
+      </div>
     </main>
   );
 }
